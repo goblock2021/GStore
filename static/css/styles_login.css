@@ -1,0 +1,72 @@
+*{
+    margin: 0;
+}
+
+body{
+    position: relative;
+    height: 100vh;
+}
+
+.background_img{
+    width: 100vw; /* 100% 视口宽度，水平方向撑满屏幕 */
+    height: 100vh; /* 100% 视口高度，垂直方向撑满屏幕 */
+    object-fit: cover; /* 图片保持纵横比，同时填充元素 */
+    object-position: center; /* 图片在元素中居中 */
+    opacity: 0.8; /* 图片透明度，可根据需要调整 */
+    position: absolute;
+}
+
+.login-container {
+    border-radius: 10px;
+    height: 380px;
+    position: absolute;
+    top: 50%;
+    left: 75%;
+    transform: translate(-50%, -50%);
+    background-color: #1C0918; /* 深色背景 */
+    padding: 20px;
+    width: 300px;
+    margin: 0 auto; /* 居中 */
+    /*text-align: right; !* 靠右对齐 *!*/
+    color: #FFFFFF; /* 文字颜色为白色 */
+    z-index: 300;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+a{
+    color: #ffffff;
+}
+
+label {
+    margin-bottom: 8px;
+}
+
+input {
+    padding: 8px;
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #2E0F22; /* 输入框背景色 */
+    color: #FFFFFF; /* 输入框文字颜色 */
+    border: 1px solid #513541; /* 输入框边框颜色 */
+}
+
+button {
+    border-radius: 5px;
+    padding: 10px 20px;
+    background: linear-gradient(to right, #3498db, #8e44ad); /* 蓝紫色渐变 */
+    color: #FFFFFF; /* 按钮文字颜色为白色 */
+    border: none;
+    cursor: pointer;
+    animation: all 5s ease-in-out;
+}
+
+button:hover {
+    background: linear-gradient(to right, #8e44ad, #3498db); /* 按钮悬停时的渐变效果 */
+}

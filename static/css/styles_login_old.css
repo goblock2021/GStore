@@ -1,0 +1,57 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: url('background-image.jpg') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.login-container {
+    background: rgba(128, 0, 128, 0.7); /* 紫色半透明背景 */
+    padding: 20px;
+    width: 300px;
+    border-radius: 8px;
+    margin-right: 20px; /* 调整表单距离屏幕右侧的距离 */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.login-container h2 {
+    color: #fff;
+    text-align: center;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form label {
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.login-form input {
+    padding: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #fff;
+    border-radius: 4px;
+}
+
+.login-form button {
+    padding: 10px;
+    background-color: #fff;
+    color: #800080;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.login-form button:hover {
+    background-color: #fff;
+    color: #800080;
+    opacity: 0.9;
+}

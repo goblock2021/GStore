@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GStore - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toastr.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_login.css') }}">
+</head>
+<body>
+<img class="background_img" alt="" src="{{ url_for('static', filename='images/login_bg_1.png') }}"/>
+<div class="login-container">
+    <h1>Login</h1>
+    <form class="login-form" action="/login" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <button type="submit">Login</button>
+    </form>
+    <a href="register">Register</a>
+</div>
+
+</body>
+</html>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/toastr.js') }}"></script>

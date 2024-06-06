@@ -1,0 +1,38 @@
+<!-- admin_games.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+{% block content %}
+  <h2>Game Management</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Release Date</th>
+        <!-- 其他字段... -->
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for game in games %}
+        <tr>
+          <td>{{ game.id }}</td>
+          <td>{{ game.name }}</td>
+          <td>{{ game.release_date }}</td>
+          <!-- 其他字段... -->
+          <td><a href="">Edit</a></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+</body>
+</html>

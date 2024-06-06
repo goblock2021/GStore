@@ -1,0 +1,184 @@
+/*清除默认边距*/
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+html{
+    font-family: Inter, SF Pro Text, Roboto, Helvetica Neue, Helvetica, Tahoma, Arial, PingFang SC, Microsoft YaHei!important;
+}
+
+button{
+    cursor: pointer;
+}
+
+.header-and-searchbar{
+    height:660px;
+    background-size: 1920px 660px;
+    background-position: 50%;
+
+}
+
+#nav{
+    align-items: center;
+    /*margin-top: 20px;*/
+    /*padding-top: 30px;*/
+    width: 100%;
+    height: 90px;
+    display: flex;
+    /*border: 1px solid black;*/
+    z-index: 1000;
+}
+
+#nav.fixed{
+    /*border: 1px solid black;*/
+    position: fixed;
+    top:0;
+    backdrop-filter: blur(4px);
+    background-color: rgba(16,16,16,.9);
+}
+
+#nav_logo{
+    display: flex;
+    align-items: center;
+    margin: 0px 20px 0px 120px;
+    height: 60px;
+    width: 180px;
+    color: #3498db;
+    font-weight: bold;
+    font-size: 32px;
+}
+
+.nav_links{
+    margin-left: 100px;
+    align-items: center;
+    /*float: left;*/
+    display: flex;
+    color: #ffffff;
+}
+
+.nav_link_div{
+    margin-right: 50px;
+    color: #ffffff;
+}
+
+.nav_link_a{
+    /*float: left;*/
+    color: #ffffff;
+    text-decoration: none;
+    position: relative;
+}
+
+
+/* 鼠标悬停显示下划线动画 */
+
+.nav_link_a::before,
+.nav_link_a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 3px;
+    background-color: #3498db; /* 下划线颜色 */
+    bottom: -5px;
+    transition: all 0.3s ease; /* 过渡效果 */
+}
+
+.nav_link_a::before {
+    left: 50%;
+    transform-origin: 100% 50%;
+}
+
+.nav_link_a::after {
+    right: 50%;
+    transform-origin: 0% 50%;
+}
+
+.nav_link_a:hover::before {
+    width: 50%;
+    transform: scaleX(1);
+}
+
+.nav_link_a:hover::after {
+    width: 50%;
+    transform: scaleX(1);
+}
+
+/* 悬停下划线动画部分结束 */
+
+.nav_login_button {
+    margin-left: auto;
+    margin-right: 120px;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    background: linear-gradient(to bottom, #4853a0, #693bb3);
+    border-radius: 20px;
+    border: 1px solid #693bb3;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.nav_login_button:hover {
+    background: linear-gradient(to bottom, #693bb3, #4853a0);
+}
+
+.user_panel{
+    margin-left: auto;
+    margin-right: 120px;
+    color: #FFFFFF;
+    position: relative;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgb(56, 5, 61);
+    /*background: #141415;*/
+}
+
+.user_panel:hover{
+    background: rgb(66, 15, 71);
+}
+
+.user_panel_popup{
+    visibility: hidden;
+    left: -35px;
+    width: 150px;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    /*justify-content: center;*/
+    z-index: 1001;
+    top: 50px;
+}
+
+.user_panel_popup_line{
+    background: rgb(33,33,33);
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+}
+
+.user_panel_popup_line:hover{
+    background: rgb(44, 44, 44);
+}
+
+.user_panel_popup_line_a{
+    text-decoration: none;
+    color: #FFFFFF;
+}
+
+footer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    color: #70757a;
+    background: rgb(16,16,16);
+}

@@ -1,0 +1,211 @@
+<!-- templates/index.html -->
+<!--
+
+    12023052132 韩昕炜
+
+    !) Copyright Warning
+
+    © 2023 GoBlock2021. All rights reserved. Unauthorized reproduction or distribution is prohibited.
+
+    For assignment display purposes only; this page will not engage in any commercial activities.
+    Please refrain from using it for commercial purposes or redistributing it without permission.
+
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GStore - Level Up Your Fun, GStore Has Begun!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+<div class="header-and-searchbar"
+     style="background-image: url({{ url_for('static', filename='images/index_bg_1.jpg') }});">
+    <div id="nav">
+        <div id="nav_logo">GStore</div>
+        <div class="nav_links">
+            <div class="nav_link_div"><a class="nav_link_a" href="/">Home</a></div>
+            <div class="nav_link_div"><a class="nav_link_a" href="/explore">Explore</a></div>
+<!--            <div class="nav_link_div"><a class="nav_link_a" href="#">Link3</a></div>-->
+        </div>
+        {% if current_user.is_authenticated %}
+            <div class="user_panel" onclick="function user_panel_popup() {
+                user_panel_popup = document.getElementById('user_panel_popup');
+                if (user_panel_popup.style.visibility === 'hidden')
+                    user_panel_popup.style.visibility = 'visible';
+                else
+                    user_panel_popup.style.visibility = 'hidden';
+            }
+            user_panel_popup()">
+                {{ current_user.username }}
+                <div id="user_panel_popup" class="user_panel_popup">
+                    <ul>
+                        {% if current_user.is_admin %}
+                        <li class="user_panel_popup_line" onclick="goToUrl('')">Manage</li>
+                        {% endif %}
+                        <li class="user_panel_popup_line" onclick="goToUrl('')">Profile</li>
+                        <li class="user_panel_popup_line" onclick="goToUrl('{{ url_for('logout') }}')">Logout</li>
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <button class="nav_login_button" onclick="login_button_onclick()">Login</button>
+        {% endif %}
+        </div>
+    <div class="content-container">
+        <div>
+            <!--内容栏-->
+            <div class="home-main-title">Explore your favourite video games!</div>
+            <div class="search_bar" id="search_bar" onfocusin="search_popup(true)" onfocusout="search_popup(false)" tabindex="0">
+                <div class="search_inner">
+                    <input id="search_input" type="text" placeholder="Search whatever you want here!">
+                </div>
+                <button class="search_button" onclick="search()">Find out!</button>
+                <!--/explore?search=search-->
+                <div id="search_advice" class="search_advice">
+                    <div id="search_results"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div>
+
+</div>
+<footer>
+    © 2023 GoBlock2021. All rights reserved. Unauthorized reproduction or distribution is prohibited.
+</footer>
+
+
+</body>
+</html>
+<script src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
+
+<script type="text/javascript">
+
+    var search_results_count=0;
+
+    //===========================================================
+
+    // 获取输入元素
+    var inputElement = document.getElementById('search_input');
+    // 添加输入事件监听器
+    inputElement.addEventListener('input', function(event) {
+        // search_query();
+    });
+
+    //===========================================================
+
+    // 滚动到足够底部导航栏脱离
+    document.addEventListener("DOMContentLoaded", function () {
+        window.addEventListener("scroll", function () {
+            var topNavbar = document.getElementById("nav");
+
+            if (window.scrollY > 100) {
+                topNavbar.classList.add("fixed");
+
+            } else {
+                topNavbar.classList.remove("fixed");
+            }
+        });
+    });
+
+    var clicks = 0;
+
+    function login_button_onclick() {
+        window.location.href = "{{ url_for('login') }}";
+    }
+
+    function search_popup(hasFocus) {
+        var search_advice = document.getElementById("search_advice");
+        var search_bar = document.getElementById("search_bar");
+        if (hasFocus == true) {
+            search_advice.style.visibility = "visible";
+            search_bar.style.borderRadius = "30px 30px 0 0";
+            changeHeight("search_advice",search_results_count*32+30);
+        } else {
+            search_advice.style.visibility = "hidden";
+            search_bar.style.borderRadius = "30px 30px 30px 30px";
+            changeHeight("search_advice",0);
+        }
+    }
+
+    function search_popup_change(hasText) {
+        var search_advice = document.getElementById("search_advice");
+        if (hasText == true) {
+            //     显示查找
+        } else {
+            //     显示推荐
+        }
+    }
+
+    function goToUrl(url) {
+        window.location.href = url;
+    }
+
+function changeHeight(id, newHeight) {
+        var element = document.getElementById(id);
+        // 设置 max-height 为足够大的值
+        element.style.maxHeight = '1000px';
+        // 设置新的高度
+        element.style.height = newHeight + 'px';
+        // 移除 max-height，以便高度可以自动调整
+        element.style.maxHeight = null;
+        // 添加触发动画的类
+        element.classList.add('animate-height');
+}
+
+    function search_query() {
+        var keyword = $(this).val();
+        var resultsList = $('#search_results');
+        if (keyword !== ""){
+            $.ajax({
+                url: '/search',
+                method: 'GET',
+                data: {keyword: keyword},
+                success: function (data) {
+                    resultsList.empty();
+                    {
+                        if (data.length > 0) {
+                            for (var i = 0; i < Math.min(data.length, 6); i++) {
+                                var product = data[i];
+                                resultsList.append('<a class="search_result_line" onmousedown="goToUrl(\'' + product['url'] + '\')">' + product['name'] + '</a>');
+                            }
+
+                        } else {
+                            resultsList.append('<a class="search_result_line_none">No results found</a>');
+                        }
+
+                    }
+                    search_results_count = Math.max(Math.min(data.length, 6), 1);
+                    console.log(search_results_count,data.length);
+                    changeHeight("search_advice", search_results_count * 32 + 30);
+                }
+            });
+        } else {
+            console.log("empty")
+            resultsList.empty();
+            search_results_count=0;
+        }
+        console.log("CH:",search_results_count);
+        changeHeight("search_advice", search_results_count * 32 + 30);
+    }
+
+    $(document).ready(function () {
+         $('#search_input').on('input',search_query );});
+
+    function search() {
+        // 获取搜索框中的值
+        var searchInput = document.getElementById('search_input').value;
+
+        // 构造搜索页面的URL
+        var searchUrl = '/explore?search=' + encodeURIComponent(searchInput);
+
+        // 跳转到搜索页面
+        window.location.href = searchUrl;
+    }
+</script>

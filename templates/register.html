@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GStore - Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toastr.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_register.css') }}">
+</head>
+<body>
+<img class="background_img" alt="" src="{{ url_for('static', filename='images/login_bg_1.png') }}"/>
+<div class="register-container">
+    <h2>Register</h2>
+    <form class="register-form" onsubmit="return validateForm()" method="POST" action="{{ url_for('register') }}">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="confirm_password">Confirm Password:</label>
+        <input type="password" id="confirm_password" name="confirm_password" required>
+
+        <button type="submit">Register</button>
+    </form>
+    <a href="login">Login</a>
+</div>
+
+<script>
+    function validateForm() {
+        var password = document.getElementById("password").value;
+        var confirm_password = document.getElementById("confirm_password").value;
+
+        if (password !== confirm_password) {
+            toastr.warning("Passwords do not match. Please try again.");
+            return false; // 阻止表单提交
+        }
+
+        return true; // 允许表单提交
+    }
+</script>
+
+</body>
+</html>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/toastr.js') }}"></script>
