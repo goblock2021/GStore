@@ -10,37 +10,7 @@
 </head>
 <body>
 <div class="placeholder">
-    <div id="nav">
-        <div id="nav_logo">GStore</div>
-        <div class="nav_links">
-            <div class="nav_link_div"><a class="nav_link_a" href="/">Home</a></div>
-            <div class="nav_link_div"><a class="nav_link_a" href="/explore">Explore</a></div>
-<!--            <div class="nav_link_div"><a class="nav_link_a" href="#">Link3</a></div>-->
-        </div>
-        {% if current_user.is_authenticated %}
-        <div class="user_panel" onclick="function user_panel_popup() {
-                    user_panel_popup = document.getElementById('user_panel_popup');
-                    if (user_panel_popup.style.visibility === 'hidden')
-                        user_panel_popup.style.visibility = 'visible';
-                    else
-                        user_panel_popup.style.visibility = 'hidden';
-                }
-                user_panel_popup()">
-            {{ current_user.username }}
-            <div id="user_panel_popup" class="user_panel_popup">
-                <ul>
-                    {% if current_user.is_admin %}
-                    <li class="user_panel_popup_line" onclick="goToUrl('')">Manage</li>
-                    {% endif %}
-                    <li class="user_panel_popup_line" onclick="goToUrl('')">Profile</li>
-                    <li class="user_panel_popup_line" onclick="goToUrl('{{ url_for('logout') }}')">Logout</li>
-                </ul>
-            </div>
-        </div>
-        {% else %}
-        <button class="nav_login_button" onclick="login_button_onclick()">Login</button>
-        {% endif %}
-    </div>
+    {% include 'nav.html' %}
 </div>
 <div class="game_detail">
     <img class="game_image" src="{{ url_for('static', filename='images/istockphoto-1324673294-170667a.jpg') }}" alt="Game Image">
@@ -48,10 +18,10 @@
         <h1>{{ game.name }}</h1>
         <div class="massive_details">
 
-            <p>Release Date: {{ game.release_date }}</p>
-            <p>Developer: {{ game.developer }}</p>
-            <p>Publisher: {{ game.publisher }}</p>
-            <p>Tags: {{ game.tags }}</p>
+            <p>发行日期： {{ game.release_date }}</p>
+            <p>开发商： {{ game.developer }}</p>
+            <p>发行商： {{ game.publisher }}</p>
+            <p>标签： {{ game.tags }}</p>
             {% if game.is_discounted %}
                 <p class="price">Price: ${{ game.discount_price }}</p>
                 <p class="ori_price">${{ game.price }}</p>
@@ -60,12 +30,10 @@
             {% endif %}
 
         </div>
-        <button class="purchase">Purchase</button>
+        <button class="purchase">购买</button>
     </div>
 </div>
-<footer>
-    © 2023 GoBlock2021. All rights reserved. Unauthorized reproduction or distribution is prohibited.
-</footer>
+{% include 'footer.html' %}
 </body>
 </html>
 <script type="text/javascript">

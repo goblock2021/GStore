@@ -1,0 +1,31 @@
+    <div id="nav">
+        <div id="nav_logo">GStore</div>
+        <div class="nav_links">
+            <div class="nav_link_div"><a class="nav_link_a" href="/">主页</a></div>
+            <div class="nav_link_div"><a class="nav_link_a" href="/explore">探索</a></div>
+<!--            <div class="nav_link_div"><a class="nav_link_a" href="#">Link3</a></div>-->
+        </div>
+        {% if current_user.is_authenticated %}
+            <div class="user_panel" onclick="function user_panel_popup() {
+                user_panel_popup = document.getElementById('user_panel_popup');
+                if (user_panel_popup.style.visibility === 'hidden')
+                    user_panel_popup.style.visibility = 'visible';
+                else
+                    user_panel_popup.style.visibility = 'hidden';
+            }
+            user_panel_popup()">
+                {{ current_user.username }}
+                <div id="user_panel_popup" class="user_panel_popup">
+                    <ul>
+                        {% if current_user.is_admin %}
+                        <li class="user_panel_popup_line" onclick="goToUrl('{{ url_for('admin_games') }}')">管理后台</li>
+                        {% endif %}
+                        <li class="user_panel_popup_line" onclick="goToUrl('')">个人中心</li>
+                        <li class="user_panel_popup_line" onclick="goToUrl('{{ url_for('logout') }}')">登出</li>
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <button class="nav_login_button" onclick="login_button_onclick()">登录</button>
+        {% endif %}
+    </div>

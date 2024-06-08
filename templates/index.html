@@ -16,53 +16,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GStore - Level Up Your Fun, GStore Has Begun!</title>
+    <title>GStore - 三江最大的电子游戏发行平台</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_index.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toastr.css') }}">
 </head>
 <body>
 <div class="header-and-searchbar"
      style="background-image: url({{ url_for('static', filename='images/index_bg_1.jpg') }});">
-    <div id="nav">
-        <div id="nav_logo">GStore</div>
-        <div class="nav_links">
-            <div class="nav_link_div"><a class="nav_link_a" href="/">Home</a></div>
-            <div class="nav_link_div"><a class="nav_link_a" href="/explore">Explore</a></div>
-<!--            <div class="nav_link_div"><a class="nav_link_a" href="#">Link3</a></div>-->
-        </div>
-        {% if current_user.is_authenticated %}
-            <div class="user_panel" onclick="function user_panel_popup() {
-                user_panel_popup = document.getElementById('user_panel_popup');
-                if (user_panel_popup.style.visibility === 'hidden')
-                    user_panel_popup.style.visibility = 'visible';
-                else
-                    user_panel_popup.style.visibility = 'hidden';
-            }
-            user_panel_popup()">
-                {{ current_user.username }}
-                <div id="user_panel_popup" class="user_panel_popup">
-                    <ul>
-                        {% if current_user.is_admin %}
-                        <li class="user_panel_popup_line" onclick="goToUrl('')">Manage</li>
-                        {% endif %}
-                        <li class="user_panel_popup_line" onclick="goToUrl('')">Profile</li>
-                        <li class="user_panel_popup_line" onclick="goToUrl('{{ url_for('logout') }}')">Logout</li>
-                    </ul>
-                </div>
-            </div>
-        {% else %}
-            <button class="nav_login_button" onclick="login_button_onclick()">Login</button>
-        {% endif %}
-        </div>
+    {% include 'nav.html' %}
     <div class="content-container">
         <div>
             <!--内容栏-->
-            <div class="home-main-title">Explore your favourite video games!</div>
+            <div class="home-main-title">探索您最爱的电子游戏</div>
             <div class="search_bar" id="search_bar" onfocusin="search_popup(true)" onfocusout="search_popup(false)" tabindex="0">
                 <div class="search_inner">
-                    <input id="search_input" type="text" placeholder="Search whatever you want here!">
+                    <input id="search_input" type="text" placeholder="在此搜索您想要的内容">
                 </div>
-                <button class="search_button" onclick="search()">Find out!</button>
+                <button class="search_button" onclick="search()">搜索</button>
                 <!--/explore?search=search-->
                 <div id="search_advice" class="search_advice">
                     <div id="search_results"></div>
@@ -76,15 +47,14 @@
 <div>
 
 </div>
-<footer>
-    © 2023 GoBlock2021. All rights reserved. Unauthorized reproduction or distribution is prohibited.
-</footer>
+{% include 'footer.html' %}
 
 
 </body>
 </html>
 <script src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
-
+<script src="{{ url_for('static', filename='js/toastr.js') }}"></script>
+{% include 'flash_js.html' %}
 <script type="text/javascript">
 
     var search_results_count=0;
@@ -147,17 +117,17 @@
         window.location.href = url;
     }
 
-function changeHeight(id, newHeight) {
-        var element = document.getElementById(id);
-        // 设置 max-height 为足够大的值
-        element.style.maxHeight = '1000px';
-        // 设置新的高度
-        element.style.height = newHeight + 'px';
-        // 移除 max-height，以便高度可以自动调整
-        element.style.maxHeight = null;
-        // 添加触发动画的类
-        element.classList.add('animate-height');
-}
+    function changeHeight(id, newHeight) {
+            var element = document.getElementById(id);
+            // 设置 max-height 为足够大的值
+            element.style.maxHeight = '1000px';
+            // 设置新的高度
+            element.style.height = newHeight + 'px';
+            // 移除 max-height，以便高度可以自动调整
+            element.style.maxHeight = null;
+            // 添加触发动画的类
+            element.classList.add('animate-height');
+    }
 
     function search_query() {
         var keyword = $(this).val();
@@ -177,21 +147,18 @@ function changeHeight(id, newHeight) {
                             }
 
                         } else {
-                            resultsList.append('<a class="search_result_line_none">No results found</a>');
+                            resultsList.append('<a class="search_result_line_none">无搜索结果</a>');
                         }
 
                     }
                     search_results_count = Math.max(Math.min(data.length, 6), 1);
-                    console.log(search_results_count,data.length);
                     changeHeight("search_advice", search_results_count * 32 + 30);
                 }
             });
         } else {
-            console.log("empty")
             resultsList.empty();
             search_results_count=0;
         }
-        console.log("CH:",search_results_count);
         changeHeight("search_advice", search_results_count * 32 + 30);
     }
 

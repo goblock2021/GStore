@@ -2,59 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GStore - Explore</title>
+    <title>GStore - 探索</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_explore.css') }}">
 </head>
 <body>
 <div class="placeholder">
-    <div id="nav">
-        <div id="nav_logo">GStore</div>
-        <div class="nav_links">
-            <div class="nav_link_div"><a class="nav_link_a" href="/">Home</a></div>
-            <div class="nav_link_div"><a class="nav_link_a" href="/explore">Explore</a></div>
-<!--            <div class="nav_link_div"><a class="nav_link_a" href="#">Link3</a></div>-->
-        </div>
-        {% if current_user.is_authenticated %}
-        <div class="user_panel" onclick="function user_panel_popup() {
-                    user_panel_popup = document.getElementById('user_panel_popup');
-                    if (user_panel_popup.style.visibility === 'hidden')
-                        user_panel_popup.style.visibility = 'visible';
-                    else
-                        user_panel_popup.style.visibility = 'hidden';
-                }
-                user_panel_popup()">
-            {{ current_user.username }}
-            <div id="user_panel_popup" class="user_panel_popup">
-                <ul>
-                    <li class="user_panel_popup_line" onclick="goToUrl('')">Profile</li>
-                    <li class="user_panel_popup_line" onclick="goToUrl('{{ url_for('logout') }}')">Logout</li>
-                </ul>
+    {% include 'nav.html' %}
+</div>
+
+
+<div class="explore">
+
+    <div id="explore_detail">
+        {% if search_term != "" %} “{{search_term}}”的搜索结果 {% endif %}
+        {% if search_tags != "" %} 已应用 {{ search_tags.split(" ")|length }} 个标签 {% endif %}
+        已找到 {{ games|length }} 个结果
+    </div>
+
+    <div class="horizontal_box">
+
+        <div class="game-container">
+            {% for game in games %}
+            <div class="game-item" onclick="goToUrl('/game/{{ game.id }}')">
+                <img class="game_cover_img" src="{{ url_for('static', filename='images/GenshinImpact_FM.png') }}"/>
+                <p>{{ game.name }}</p>
+                <!--<p>Release Date: {{ game.release_date }}</p>-->
+<!--                <p>{% if game.is_discounted %}<del>${{ game.price }}</del> ${{ game.discount_price }}{% else %}${{ game.price }}{% endif %}</p>-->
+                <p>
+                    {% if game.is_discounted %}
+                        {% set discount_percent = ((game.price - game.discount_price) / game.price) * 100 %}
+                        <a class="discount_box">-{{ discount_percent|round(2) }}%</a>
+                        <del>${{ game.price }}</del>
+                        ${{ game.discount_price }}
+                    {% else %}
+                        ${{ game.price }}
+                    {% endif %}
+                </p>
+                <!--<p>Tags: {{ game.tags }}</p>-->
+                <!--<a class="purchase_a" href="/game/{{ game.id }}">Purchase</a>-->
             </div>
+            {% endfor %}
         </div>
-        {% else %}
-        <button class="nav_login_button" onclick="login_button_onclick()">Login</button>
-        {% endif %}
+
+        <div class="filter">
+            <h2>筛选</h2>
+            <hr>
+            <input type="text" name="search" placeholder="搜索游戏">
+                {% for tag in tags %}
+                    <label>
+                        <input type="checkbox" name="tags" class="tagCheckbox" value="{{ tag }}">
+                        {{ tag }}
+                    </label>
+                {% endfor %}
+            <hr>
+            <button onclick="buildRequest()">筛选</button>
+        </div>
+
     </div>
 </div>
 
-<div class="game-container">
 
-    {% for game in games %}
-    <div class="game-item" onclick="goToUrl('/game/{{ game.id }}')">
-        <img class="game_cover_img" src="{{ url_for('static', filename='images/GenshinImpact_FM.png') }}"/>
-        <p>{{ game.name }}</p>
-<!--        <p>Release Date: {{ game.release_date }}</p>-->
-        <p>{% if game.is_discounted %}<del>${{ game.price }}</del> ${{ game.discount_price }}{% else %}${{ game.price }}{% endif %}</p>
-<!--        <p>Tags: {{ game.tags }}</p>-->
-<!--        <a class="purchase_a" href="/game/{{ game.id }}">Purchase</a>-->
-    </div>
-    {% endfor %}
-
-</div>
-<footer>
-    © 2023 GoBlock2021. All rights reserved. Unauthorized reproduction or distribution is prohibited.
-</footer>
+{% include 'footer.html' %}
 </body>
 </html>
 <script type="text/javascript">
@@ -77,4 +86,48 @@
             }
         });
     });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 获取搜索标签变量
+        var searchTags = "{{ search_tags }}";
+        var search_term = "{{ search_term }}";
+
+        // 分割搜索标签变量
+        var searchTagsArray = searchTags.split(' ');
+        var search_term_input = document.querySelector('input[name="search"]');
+
+        search_term_input.value = search_term
+
+        search_term_input.addEventListener("keyup", function(event) {
+            // 检查按下的键是否是回车键
+            if (event.key === "Enter") {
+                // 执行您的函数
+                buildRequest();
+            }
+        });
+
+        // 遍历所有复选框
+        var checkboxes = document.querySelectorAll('.tagCheckbox');
+        checkboxes.forEach(function(checkbox) {
+            // 检查复选框的值是否在搜索标签数组中
+            if (searchTagsArray.includes(checkbox.value)) {
+                checkbox.checked = true; // 如果是，则勾选复选框
+            }
+        });
+    });
+
+    function buildRequest() {
+        var selectedTags = [];
+        var search_term_input = document.querySelector('input[name="search"]');
+        var searchQueryParam = encodeURIComponent(search_term_input.value);
+        var checkboxes = document.getElementsByClassName("tagCheckbox");
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                selectedTags.push(encodeURIComponent(checkboxes[i].value));
+            }
+        }
+        var tagsQueryParam = selectedTags.join('%20');
+        window.location.href = "http://127.0.0.1:2333/explore?search=" + searchQueryParam + "&tags=" + tagsQueryParam;
+    }
 </script>

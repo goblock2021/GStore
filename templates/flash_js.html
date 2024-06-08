@@ -1,0 +1,34 @@
+<!-- 闪存消息显示 -->
+<!-- 必须先引入toastr.js，然后再引入flash_js.html，否则会报错。 -->
+
+<script type="text/javascript">
+    var flashMessages = [];
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            flashMessages = [
+                {% for category, message in messages %}
+                    { "category": "{{ category }}", "message": "{{ message }}" },
+                {% endfor %}
+            ];
+        {% endif %}
+    {% endwith %}
+
+    document.addEventListener("DOMContentLoaded", function() {
+        flashMessages.forEach(function(flash) {
+            console.log("Category: " + flash.category + ", Message: " + flash.message);
+            if (flash.category == "error")
+                toastr.error(flash.message);
+            else if (flash.category == "info")
+                toastr.info(flash.message);
+            else if (flash.category == "warning")
+                toastr.warning(flash.message);
+            else if (flash.category == "success")
+                toastr.success(flash.message);
+            else{
+                console.warn("Unknown category: " + flash.category);
+                toastr.info(flash.message);
+            }
+        });
+    });
+
+</script>

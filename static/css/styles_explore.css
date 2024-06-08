@@ -1,24 +1,44 @@
 .placeholder{
     position: relative;
     height: 90px;
-    background: #000000 linear-gradient(to bottom,#000000,rgb(29,15,44));
+    background: #000000 linear-gradient(to bottom,#120338,rgb(30, 30, 30));
 }
 
 body{
     background: rgb(30, 30, 30);
 }
 
-.game-container {
-    width: 855px;
+.explore{
     color: white;
+    margin-top: 30px;
     margin-left: 80px;
     margin-right: 80px;
+}
+#explore_detail{
+    margin-bottom: 20px;
+}
+.horizontal_box{
+    display: flex;
+    flex-direction: row;
+    /*justify-content: space-between;*/
+    /*margin-bottom: 20px;*/
+}
+.game-container {
+    width: 855px;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
     /*justify-content: space-between;*/
 }
 
+.filter{
+    display: flex;
+    flex-direction: column;
+}
+.filter hr{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 .game-item {
     width: 23%; /* 控制每个游戏项的宽度，以便一行显示4个游戏 */
     margin-bottom: 20px;

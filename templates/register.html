@@ -10,20 +10,20 @@
 <body>
 <img class="background_img" alt="" src="{{ url_for('static', filename='images/login_bg_1.png') }}"/>
 <div class="register-container">
-    <h2>Register</h2>
+    <h2>注册</h2>
     <form class="register-form" onsubmit="return validateForm()" method="POST" action="{{ url_for('register') }}">
-        <label for="username">Username:</label>
+        <label for="username">用户名：</label>
         <input type="text" id="username" name="username" required>
 
-        <label for="password">Password:</label>
+        <label for="password">密码：</label>
         <input type="password" id="password" name="password" required>
 
-        <label for="confirm_password">Confirm Password:</label>
+        <label for="confirm_password">确认密码：</label>
         <input type="password" id="confirm_password" name="confirm_password" required>
 
-        <button type="submit">Register</button>
+        <button type="submit">注册</button>
     </form>
-    <a href="login">Login</a>
+    <a href="login">登录</a>
 </div>
 
 <script>
@@ -32,7 +32,7 @@
         var confirm_password = document.getElementById("confirm_password").value;
 
         if (password !== confirm_password) {
-            toastr.warning("Passwords do not match. Please try again.");
+            toastr.warning("两次密码不一致，请重试");
             return false; // 阻止表单提交
         }
 
