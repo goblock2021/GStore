@@ -3,7 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Games</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.11.3/datatables.min.css"/>
+    <style>
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #007bff;
+    text-align: center;
+    margin-top: 20px;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+    margin-bottom: 10px;
+    display: block;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.flashes {
+    list-style-type: none;
+    padding: 0;
+}
+
+.flashes li {
+    margin-bottom: 10px;
+}
+
+.error {
+    color: red;
+}
+
+.success {
+    color: green;
+}
+
+#game_table {
+    width: 100%;
+    background-color: #fff;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#game_table th, #game_table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+#game_table th {
+    background-color: #007bff;
+    color: #fff;
+}
+
+#game_table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#game_table tbody tr:hover {
+    background-color: #e6f7ff;
+}
+.button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    margin-right: 5px;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+.delete-button {
+    background-color: #dc3545;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+        .add {
+            text-decoration: none;
+            width: 80px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .add:hover {
+            background: #0056b3;
+        }
+        div.dataTables_wrapper div.dataTables_paginate{
+            display: flex;
+            gap: 10px
+        }
+        div.dataTables_wrapper div.dataTables_paginate span{
+            display: flex;
+            gap: 10px
+        }
+    </style>
 </head>
 <body>
     <h1>管理游戏</h1>
@@ -16,8 +128,8 @@
         </ul>
       {% endif %}
     {% endwith %}
-    <a href="{{ url_for('add_game') }}">添加游戏</a>
-    <table>
+    <a class="add" href="{{ url_for('add_game') }}">添加游戏</a>
+    <table id="game_table">
         <thead>
             <tr>
                 <th>ID</th>
@@ -29,7 +141,7 @@
                 <th>开发商</th>
                 <th>发行商</th>
                 <th>标签</th>
-                <th>操作</th>
+                <th width="120px">操作</th>
             </tr>
         </thead>
         <tbody>
@@ -45,14 +157,23 @@
                 <td>{{ game.publisher }}</td>
                 <td>{{ game.tags }}</td>
                 <td>
-                    <a href="{{ url_for('edit_game', game_id=game.id) }}">编辑</a>
+                    <form action="{{ url_for('edit_game', game_id=game.id) }}" method="get" style="display: inline;">
+                        <button type="submit" class="button">编辑</button>
+                    </form>
                     <form action="{{ url_for('delete_game', game_id=game.id) }}" method="post" style="display:inline;">
-                        <button type="submit" onclick="return confirm('确定要删除吗？');">删除</button>
+                        <button type="submit" class="button delete-button" onclick="return confirm('确定要删除吗？');">删除</button>
                     </form>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#game_table').DataTable();
+        });
+    </script>
 </body>
 </html>

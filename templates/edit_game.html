@@ -4,9 +4,119 @@
     <meta charset="UTF-8">
     <title>Edit Game</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style type="text/css">
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .header_box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        .back {
+            cursor: pointer;
+            color: #007BFF;
+        }
+
+        .header_box p {
+            flex-grow: 1;
+            text-align: center;
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .fake_form {
+            margin-top: 20px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            box-sizing: border-box;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        input[type="submit"] {
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background: #0056b3;
+        }
+        button {
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .delete-button {
+            background-color: #dc3545;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+
+    </style>
 </head>
 <body>
-    <h1>编辑游戏</h1>
+    <div class="header_box">
+        <div class="back" onclick="history.back()">返回</div>
+        <p>编辑游戏</p>
+    </div>
+    <div class="fake_form">
     <form method="post">
         {{ form.hidden_tag() }}
         <p>
@@ -48,7 +158,8 @@
         <p><input type="submit" value="保存"></p>
     </form>
     <form action="/admin/games/{{game_id}}/delete" method="post" style="display:inline;">
-        <button type="submit" onclick="return confirm('确定要删除吗？');">删除</button>
+        <button type="submit" class="delete-button" onclick="return confirm('确定要删除吗？');">删除</button>
     </form>
+    </div>
 </body>
 </html>
