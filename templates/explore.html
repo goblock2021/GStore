@@ -5,8 +5,13 @@
     <title>GStore - 探索</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_explore.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome-6.0.0-beta3-all-min.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
+
+<!--    <script src="https://kit.fontawesome.com/099e9ac93c.js" crossorigin="anonymous"></script>-->
 </head>
 <body>
+
 <div class="placeholder">
     {% include 'nav.html' %}
 </div>
@@ -20,43 +25,95 @@
         已找到 {{ games|length }} 个结果
     </div>
 
+    <div class="explore_sort_box">
+        <select onchange="buildRequest()">
+            <option value="default" {% if sort_option == 'default' %}selected{% endif %}>默认排序</option>
+            <option value="price_asc" {% if sort_option == 'price_asc' %}selected{% endif %}>价格升序</option>
+            <option value="price_desc" {% if sort_option == 'price_desc' %}selected{% endif %}>价格降序</option>
+            <option value="release_date_asc" {% if sort_option == 'release_date_asc' %}selected{% endif %}>发布日期升序</option>
+            <option value="release_date_desc" {% if sort_option == 'release_date_desc' %}selected{% endif %}>发布日期降序</option>
+        </select>
+    </div>
+
     <div class="horizontal_box">
 
         <div class="game-container">
             {% for game in games %}
-            <div class="game-item" onclick="goToUrl('/game/{{ game.id }}')">
-                <img class="game_cover_img" src="{{ url_for('static', filename='images/GenshinImpact_FM.png') }}"/>
-                <p>{{ game.name }}</p>
-                <!--<p>Release Date: {{ game.release_date }}</p>-->
-<!--                <p>{% if game.is_discounted %}<del>${{ game.price }}</del> ${{ game.discount_price }}{% else %}${{ game.price }}{% endif %}</p>-->
-                <p>
-                    {% if game.is_discounted %}
-                        {% set discount_percent = ((game.price - game.discount_price) / game.price) * 100 %}
-                        <a class="discount_box">-{{ discount_percent|round(2) }}%</a>
-                        <del>${{ game.price }}</del>
-                        ${{ game.discount_price }}
-                    {% else %}
-                        ${{ game.price }}
-                    {% endif %}
-                </p>
-                <!--<p>Tags: {{ game.tags }}</p>-->
-                <!--<a class="purchase_a" href="/game/{{ game.id }}">Purchase</a>-->
+            <div class="game_item" onclick="goToUrl('/game/{{ game.id }}')">
+                <div class="game_item_inside">
+                    <img class="game_cover_img" src="{{ url_for('static', filename='images/GenshinImpact_FM.png') }}"/>
+                    <p class="game_name">{{ game.name }}</p>
+                    <!--<p>Release Date: {{ game.release_date }}</p>-->
+    <!--                <p>{% if game.is_discounted %}<del>${{ game.price }}</del> ${{ game.discount_price }}{% else %}${{ game.price }}{% endif %}</p>-->
+                    <div class="game_price">
+                        {% if game.is_discounted %}
+                            {% set discount_percent = ((game.price - game.discount_price) / game.price) * 100 %}
+                            <a class="game_discount_box">-{{ discount_percent|round(2) }}%</a>
+                            <div class="game_price_inside">
+                                <del>${{ game.price }}</del>
+                                <div class="game_discount_price">${{ game.discount_price }}</div>
+                            </div>
+                        {% else %}
+                            <div class="game_price_inside">
+                                ${{ game.price }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <!--<p>Tags: {{ game.tags }}</p>-->
+                    <!--<a class="purchase_a" href="/game/{{ game.id }}">Purchase</a>-->
+                </div>
             </div>
             {% endfor %}
         </div>
 
         <div class="filter">
-            <h2>筛选</h2>
-            <hr>
-            <input type="text" name="search" placeholder="搜索游戏">
-                {% for tag in tags %}
-                    <label>
-                        <input type="checkbox" name="tags" class="tagCheckbox" value="{{ tag }}">
-                        {{ tag }}
+            <div class="filter_head">
+                <div class="filter_head_title">筛选</div>
+                <div class="filter_head_reset" onclick="goToUrl('/explore')">重置</div>
+            </div>
+
+            <!--搜索-->
+            <input type="text" class="filter_search_input" name="search" placeholder="搜索游戏">
+
+            <!--价格筛选器-->
+            <div class="price_filter">
+                <div id="filter_head_price" class="filter_head">
+                    按价格筛选
+                    <div id="filter_head_price_icon" class="filter_head_icon fa-solid fa-angle-down "></div>
+                </div>
+                <div class="filter_list">
+                    <label class="filter_item">
+                        <input type="checkbox" name="price" class="discountCheckbox" value="on_discount" hidden="hidden">
+                            特别优惠
+                        <div class="icon fa-solid fa-check"></div>
                     </label>
-                {% endfor %}
-            <hr>
-            <button onclick="buildRequest()">筛选</button>
+                    <div class="price_filter_box">
+                        筛选价格
+                        <input id="price_filter_range_input" type="range" min="0" max="260" value="260" step="20" oninput="updateValue(this.value)" onchange="buildRequest()">
+                        <span class="slider_value" id="price_filter_value_display">不限</span>
+                    </div>
+
+<!--                    <div class="price_filter_item">需要添加控件</div>-->
+                </div>
+            </div>
+
+            <!--标签筛选器-->
+            <div class="tags_filter">
+                <div id="filter_head_tags" class="filter_head">
+                    按标签筛选
+                    <div id="filter_head_tags_icon" class="filter_head_icon fa-solid fa-angle-down "></div>
+                </div>
+                <div id="tags_filter_list" class="filter_list">
+                        {% for tag in tags %}
+                            <label class="filter_item">
+                                <input type="checkbox" name="tags" class="tagCheckbox" value="{{ tag }}" hidden="hidden">
+                                {{ tag }}
+                                <div class="icon fa-solid fa-check"></div>
+                            </label>
+                        {% endfor %}
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -66,6 +123,8 @@
 {% include 'footer.html' %}
 </body>
 </html>
+
+<!--导航栏脱离-->
 <script type="text/javascript">
     function goToUrl(url) {
         window.location.href = url;
@@ -87,16 +146,50 @@
         });
     });
 </script>
+
+<!-- buildRequest 生成筛选后请求 -->
+<script>
+    function buildRequest() {
+        var selectedTags = [];
+        var search_term_input = document.querySelector('input[name="search"]');
+        var searchQueryParam = encodeURIComponent(search_term_input.value);
+        var checkboxes = document.getElementsByClassName("tagCheckbox");
+        var sortSelect = document.querySelector('.explore_sort_box select');
+        var priceRangeInput = document.querySelector('#price_filter_range_input');
+
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                selectedTags.push(encodeURIComponent(checkboxes[i].value));
+            }
+        }
+
+        var price = 0;
+        if (priceRangeInput.value != 260) {
+            price = priceRangeInput.value;
+        }else{
+            price = "";
+        }
+        var tagsQueryParam = selectedTags.join('%20');
+        window.location.href = "http://127.0.0.1:2333/explore?search=" + searchQueryParam + "&tags=" + tagsQueryParam + "&max_price=" + price + "&sort=" + sortSelect.value;
+    }
+</script>
+
+<!--初始化筛选控件-->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         // 获取搜索标签变量
         var searchTags = "{{ search_tags }}";
         var search_term = "{{ search_term }}";
+        var max_price = "{{ max_price }}";
+        var sort_option = "{{ sort_option }}";
 
         // 分割搜索标签变量
         var searchTagsArray = searchTags.split(' ');
         var search_term_input = document.querySelector('input[name="search"]');
+        var priceRangeInput = document.querySelector('#price_filter_range_input');
+        var sortSelect = document.querySelector('.explore_sort_box select');
 
+        // 搜索字段
         search_term_input.value = search_term
 
         search_term_input.addEventListener("keyup", function(event) {
@@ -113,21 +206,58 @@
             // 检查复选框的值是否在搜索标签数组中
             if (searchTagsArray.includes(checkbox.value)) {
                 checkbox.checked = true; // 如果是，则勾选复选框
+                $(checkbox).parent().addClass('filter_item_checked');
             }
         });
-    });
 
-    function buildRequest() {
-        var selectedTags = [];
-        var search_term_input = document.querySelector('input[name="search"]');
-        var searchQueryParam = encodeURIComponent(search_term_input.value);
-        var checkboxes = document.getElementsByClassName("tagCheckbox");
-        for (var i = 0; i < checkboxes.length; i++) {
-            if (checkboxes[i].checked) {
-                selectedTags.push(encodeURIComponent(checkboxes[i].value));
-            }
+        // 价格筛选器
+        if (max_price != "None") {
+            priceRangeInput.value = max_price;
+            updateValue(max_price);
         }
-        var tagsQueryParam = selectedTags.join('%20');
-        window.location.href = "http://127.0.0.1:2333/explore?search=" + searchQueryParam + "&tags=" + tagsQueryParam;
+
+        // 排序选择器
+        // sortSelect.value = sort_option;
+
+    });
+</script>
+
+<script>
+        $(document).ready(function() {
+            $('.filter_head').on('click', function() {
+                // Toggle the visibility of the next sibling .filter_list
+                $(this).next('.filter_list').slideToggle();
+
+                // Toggle the icon class between fa-angle-down and fa-angle-up
+                $(this).find('.filter_head_icon').toggleClass('fa-angle-down fa-angle-up');
+            });
+
+            $('.tagCheckbox').on('change', function() {
+                const parent_filter_item = $(this).parent();
+                if (this.checked) {
+                    parent_filter_item.addClass('filter_item_checked');
+                } else {
+                    parent_filter_item.removeClass('filter_item_checked');
+                }
+            });
+
+            $(".filter_item").click(function () {
+                buildRequest();
+            });
+
+        });
+</script>
+<script>
+    function updateValue(value) {
+        if (value == 260) {
+            value = "不限";
+        }
+        else if (value == 0) {
+            value = "免费";
+        }
+        else {
+            value = "$" + value;
+        }
+        document.getElementById('price_filter_value_display').innerText = value;
     }
 </script>

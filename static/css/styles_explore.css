@@ -15,8 +15,25 @@ body{
     margin-right: 80px;
 }
 #explore_detail{
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
+
+.explore_sort_box{
+    margin-bottom: 15px;
+}
+
+.explore_sort_box select{
+    height: 30px;
+    width: 120px;
+    border-radius: 5px;
+    background: #1e1e1e;
+    color: white;
+}
+
+/*.explore_sort_box select option{*/
+/*    margin: 50px;*/
+/*}*/
+
 .horizontal_box{
     display: flex;
     flex-direction: row;
@@ -30,21 +47,125 @@ body{
     justify-content: flex-start;
     /*justify-content: space-between;*/
 }
+.game_price{
+    /*height: 40px;*/
+    color: white;
+    display: flex;
+    justify-content: space-between;
+}
+
+.game_discount_box{
+    height: 120%;
+    padding: 4px 8px;
+    /*border: #2F96B4 solid 1px;*/
+    background: #1d39c4;
+    border-radius: 5px;
+}
+
+.game_price_inside{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.game_discount_price{
+    margin-left: 10px;
+}
 
 .filter{
     display: flex;
     flex-direction: column;
 }
+
+.filter_head{
+    display: flex;
+    justify-content: space-between;
+    align-items: center
+}
+
+.filter_head_title{
+    font-size: 25px;
+}
+
+.filter_head_reset{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 .filter hr{
     margin-top: 10px;
     margin-bottom: 10px;
 }
-.game-item {
+
+.price_filter_box{
+    padding: 10px;
+}
+
+.filter_search_input{
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    /*margin-bottom: 10px;*/
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background: #1e1e1e;
+    color: white;
+}
+.filter_list{
+    display: flex;
+    flex-direction: column;
+
+}
+.filter_head{
+    width: 100%;
+    padding: 10px 8px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer; /* 鼠标移动到标签上时，鼠标变为手型 */
+    /*height: 30px;*/
+    /*border: #FFF solid 1px;*/
+    /*border-radius: 10px;*/
+}
+.filter_item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 6px;
+    padding-left: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.filter_item .icon{
+    display: none;
+}
+
+.filter_item:hover{
+    background: #595959;
+}
+
+.filter_item_checked{
+    background: #434343;
+}
+.filter_item_checked .icon{
+    display: block;
+}
+.game_item {
     width: 23%; /* 控制每个游戏项的宽度，以便一行显示4个游戏 */
     margin-bottom: 20px;
     /*border: 1px solid #ddd; !* 添加边框或其他样式 *!*/
     padding: 10px;
     overflow: hidden;
+    cursor: pointer;
+}
+
+.game_item_inside:hover {
+    /*box-shadow: 1px 1px 9px 2px #f0f0f0;*/
+
 }
 
 .game-container p{

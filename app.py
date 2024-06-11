@@ -6,11 +6,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, BooleanField, SubmitField
+from wtforms.fields.choices import SelectField
 from wtforms.fields.datetime import DateField
 from wtforms.validators import DataRequired
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import and_
+from sqlalchemy import and_, case
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///web_data.db'
@@ -20,7 +21,7 @@ migrate = Migrate(app, db)
 with app.app_context():
     Session = sessionmaker(bind=db.engine)
 
-app.config['SECRET_KEY'] = 'your_secret_key'  # TODO: 替换为随机的安全密钥
+app.config['SECRET_KEY'] = 'ebboPjKwol5krcOdOL7WakhoIIBShlv4'
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -36,6 +37,7 @@ class User(UserMixin, db.Model):
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
+    type = db.Column(db.String(255), nullable=True, default='Game')
     release_date = db.Column(db.Date, nullable=True)
     price = db.Column(db.Float, nullable=False)
     is_discounted = db.Column(db.Boolean, default=False)
@@ -47,6 +49,7 @@ class Game(db.Model):
 
 class GameForm(FlaskForm):
     name = StringField('名称', validators=[DataRequired()])
+    type = SelectField('类型', choices=[('Game', '游戏'), ('DLC', 'DLC')], validators=[DataRequired()])
     release_date = DateField('发行日期')
     price = FloatField('价格', validators=[DataRequired()])
     is_discounted = BooleanField('打折')
@@ -84,7 +87,6 @@ def register():
             db.session.commit()
             return redirect(
                 url_for('redirect_with_message') + '?url=/login&message=注册成功，即将跳转至登录页面&title=注册成功')
-            #'Registration successful. <a href="/">Go to Login</a>'
         else:
             return redirect(
                 url_for('redirect_with_message') + '?url=/register&message=注册失败，用户名不能重复&title=注册失败')
@@ -124,7 +126,7 @@ def logout():
 def admin_games():
     # 确保只有管理员可以访问游戏管理页面
     if not current_user.is_admin:
-        flash('You do not have permission to access this page.', 'error')
+        flash('您没有权限访问此页面', 'error')
         return redirect(url_for('index'))
     # 获取所有游戏
     games = Game.query.all()
@@ -148,7 +150,7 @@ def edit_game(game_id):
         game.tags = form.tags.data
         db.session.commit()
         return redirect(url_for('admin_games'))
-    return render_template('edit_game.html', form=form)
+    return render_template('edit_game.html', form=form, game_id=game_id)
 
 
 @app.route('/admin/games/<int:game_id>/delete', methods=['POST'])
@@ -157,7 +159,7 @@ def edit_game(game_id):
 def delete_game(game_id):
     # 确保只有管理员可以添加新游戏
     if not current_user.is_admin:
-        flash('You do not have permission to access this page.', 'error')
+        flash('您没有权限访问此页面', 'error')
         return redirect(url_for('index'))
     game = Game.query.get_or_404(game_id)
     db.session.delete(game)
@@ -170,7 +172,7 @@ def delete_game(game_id):
 def add_game():
     # 确保只有管理员可以添加新游戏
     if not current_user.is_admin:
-        flash('You do not have permission to access this page.', 'error')
+        flash('您没有权限访问此页面', 'error')
         return redirect(url_for('index'))
 
     form = GameForm()
@@ -206,17 +208,50 @@ def index():
 def explore():
     search_term = request.args.get('search', default="")
     search_tags = request.args.get('tags', default="")
+    max_price = request.args.get('max_price', type=float)  # 获取最大价格参数
+    sort_option = request.args.get('sort', default="")  # 获取排序选项
+
     games_query = Game.query
 
+    # 根据游戏名称进行搜索
     if search_term:
-        # 根据游戏名称进行搜索
         games_query = games_query.filter(Game.name.ilike(f"%{search_term}%"))
 
+    # 根据标签搜索
     if search_tags:
-        # 根据标签进行模糊搜索
         tags_list = search_tags.split()
         and_conditions = [Game.tags.ilike(f"%{tag}%") for tag in tags_list]
         games_query = games_query.filter(and_(*and_conditions))
+
+    # 根据最大价格进行过滤
+    if max_price is not None:
+        games_query = games_query.filter(
+            (Game.is_discounted == False) & (Game.price <= max_price) |
+            (Game.is_discounted == True) & (Game.discount_price <= max_price)
+        )
+
+    # 根据排序选项进行排序
+    if sort_option == "price_asc":
+        # 排序时考虑折后价格
+        games_query = games_query.order_by(
+            case(
+                (Game.is_discounted == True, Game.discount_price),
+                else_=Game.price
+            ).asc()
+        )
+    elif sort_option == "price_desc":
+        # 排序时考虑折后价格
+        games_query = games_query.order_by(
+            case(
+                (Game.is_discounted == True, Game.discount_price),
+                else_=Game.price
+            ).desc()
+        )
+    elif sort_option == "release_date_desc":
+        games_query = games_query.order_by(Game.release_date.desc())
+
+    elif sort_option == "release_date_asc":
+        games_query = games_query.order_by(Game.release_date.asc())
 
     games = games_query.all()
 
@@ -229,7 +264,13 @@ def explore():
             all_tags.update(tags)
 
     return render_template('explore.html', games=games, search_term=search_term, search_tags=search_tags,
-                           tags=sorted(all_tags))
+                           max_price=max_price, sort_option=sort_option, tags=sorted(all_tags))
+
+
+@app.route('/api/search_game')
+def game_list_api():
+    # TODO: 实现游戏列表的 API，取代服务端渲染html
+    return "Still Working ... :)"
 
 
 @app.route('/search', methods=['GET'])
