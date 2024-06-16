@@ -54,6 +54,7 @@ body{
 }
 
 .purchase{
+    width: 100%;
     border: 1px #FFFFFF solid;
     border-radius: 20px;
     margin-top: 20px;

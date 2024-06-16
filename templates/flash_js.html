@@ -14,6 +14,7 @@
     {% endwith %}
 
     document.addEventListener("DOMContentLoaded", function() {
+        console.log("Loading flash messages...");
         flashMessages.forEach(function(flash) {
             console.log("Category: " + flash.category + ", Message: " + flash.message);
             if (flash.category == "error")

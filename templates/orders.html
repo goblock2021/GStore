@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>您的订单</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toastr.css') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/toastr.js') }}"></script>
+    {% include 'flash_js.html' %}
+</head>
+<body>
+    <a href="/">回主页</a>
+    <a href="/cart">回购物车</a>
+    <h1>您的订单</h1>
+    <ul>
+        {% for order in orders %}
+            <li>
+                订单号: {{ order.id }} - 总价: ￥{{ order.total_price }} - 状态: {{ order.status }}
+                {% if order.status == 'Expired' %}
+                    <span style="color: red;">订单已过期</span>
+                {% else %}
+                    <a href="{{ url_for('pay_order', order_id=order.id) }}">支付</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

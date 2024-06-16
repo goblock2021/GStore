@@ -4,9 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ game.name }} - Game Detail</title>
+    <title>{{ game.name }} - 游戏详情</title>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/toastr.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_game_detail.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toastr.css') }}">
+    {% include 'flash_js.html' %}
 </head>
 <body>
 <div class="placeholder">
@@ -23,19 +27,23 @@
             <p>发行商： {{ game.publisher }}</p>
             <p>标签： {{ game.tags }}</p>
             {% if game.is_discounted %}
-                <p class="price">Price: ${{ game.discount_price }}</p>
+                <p class="price">价格: ${{ game.discount_price }}</p>
                 <p class="ori_price">${{ game.price }}</p>
             {% else %}
                 <p class="price">${{ game.price }}</p>
             {% endif %}
 
         </div>
-        <button class="purchase">购买</button>
+        <form action="{{ url_for('add_to_cart', game_id=game.id) }}" method="post">
+            <button class="purchase" type="submit">加入购物车</button>
+        </form>
+<!--        <button class="purchase"></button>-->
     </div>
 </div>
 {% include 'footer.html' %}
 </body>
 </html>
+
 <script type="text/javascript">
     function goToUrl(url) {
         window.location.href = url;

@@ -1,0 +1,43 @@
+<div class="tittle">游戏管理</div>
+<button onclick="goToUrl('{{ url_for('add_game') }}')" class="">添加游戏</button>
+<div class="table_container">
+    <table id="game_table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>名称</th>
+                <th>发行日期</th>
+                <th>价格</th>
+                <th>打折</th>
+                <th>折后价</th>
+                <th>开发商</th>
+                <th>发行商</th>
+                <th>标签</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for game in games %}
+            <tr>
+                <td>{{ game.id }}</td>
+                <td>{{ game.name }}</td>
+                <td>{{ game.release_date }}</td>
+                <td>{{ game.price }}</td>
+                <td>{{ "是" if game.is_discounted else "否" }}</td>
+                <td>{{ game.discount_price }}</td>
+                <td>{{ game.developer }}</td>
+                <td>{{ game.publisher }}</td>
+                <td>{{ game.tags }}</td>
+                <td>
+                    <form action="{{ url_for('edit_game', game_id=game.id) }}" method="get" style="display: inline;">
+                        <button type="submit" class="button">编辑</button>
+                    </form>
+                    <form action="{{ url_for('delete_game', game_id=game.id) }}" method="post" style="display:inline;">
+                        <button type="submit" class="button delete-btn" onclick="return confirm('确定要删除吗？');">删除</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

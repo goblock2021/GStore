@@ -1,0 +1,28 @@
+<div class="container">
+    <div class="tittle">用户管理</div>
+    <div class="table_container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>是否管理员</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ "是" if user.is_admin else "否" }}</td>
+                <td>
+                    <button onclick="goToUrl('')" class="">编辑</button>
+                    <button onclick="goToUrl('')" class="delete-btn">删除</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>

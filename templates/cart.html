@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>您的购物车</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toastr.css') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='js/toastr.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
+    {% include 'flash_js.html' %}
+    <style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+table th, table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #f2f2f2;
+}
+
+table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+table td button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+table td button:hover {
+    background-color: #c82333;
+}
+
+p {
+    text-align: center;
+    margin-top: 20px;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    float: right;
+}
+
+button[disabled] {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+    </style>
+</head>
+<body>
+    <a href="/">回主页</a>
+    <a href="/orders">订单</a>
+    <h1>您的购物车</h1>
+    {% if items %}
+        <table>
+            <thead>
+                <tr>
+                    <th>商品名称</th>
+                    <th>数量</th>
+                    <th>单价</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ item.game.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>
+                            {% if item.game.is_discounted %}
+                                ￥{{ item.game.discount_price }}（原价 ￥{{ item.game.price }}）
+                            {% else %}
+                                ￥{{ item.game.price }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form action="{{ url_for('delete_cart_item', item_id=item.game_id) }}" method="post" style="display:inline;">
+                                <button type="submit">删除</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="2"><strong>总价</strong></td>
+                    <td><strong>￥{{ total_price }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <p>您的购物车是空的。</p>
+    {% endif %}
+    <button onclick="window.location.href='{{ url_for('checkout') }}'" {% if not items %}disabled{% endif %}>去结算</button>
+
+</body>
+</html>
+
