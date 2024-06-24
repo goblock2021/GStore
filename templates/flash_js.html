@@ -1,6 +1,6 @@
 <!-- 闪存消息显示 -->
 <!-- 必须先引入toastr.js，然后再引入flash_js.html，否则会报错。 -->
-
+<link href="{{ url_for('static', filename='css/toastr.css') }}" rel="stylesheet">
 <script type="text/javascript">
     var flashMessages = [];
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -25,6 +25,8 @@
                 toastr.warning(flash.message);
             else if (flash.category == "success")
                 toastr.success(flash.message);
+            else if (flash.category == "message")
+                toastr.info(flash.message);
             else{
                 console.warn("Unknown category: " + flash.category);
                 toastr.info(flash.message);

@@ -21,50 +21,25 @@
 <div class="explore">
 
     <div id="explore_detail">
-        {% if search_term != "" %} “{{search_term}}”的搜索结果 {% endif %}
-        {% if search_tags != "" %} 已应用 {{ search_tags.split(" ")|length }} 个标签 {% endif %}
-        已找到 {{ games|length }} 个结果
+        <span id="search_result_text"></span>
+        <span id="applied_tags_text"></span>
+        已找到 <span id="total_games_count"></span> 个结果
     </div>
 
     <div class="explore_sort_box">
-        <select onchange="buildRequest()">
-            <option value="default" {% if sort_option == 'default' %}selected{% endif %}>默认排序</option>
-            <option value="price_asc" {% if sort_option == 'price_asc' %}selected{% endif %}>价格升序</option>
-            <option value="price_desc" {% if sort_option == 'price_desc' %}selected{% endif %}>价格降序</option>
-            <option value="release_date_asc" {% if sort_option == 'release_date_asc' %}selected{% endif %}>发布日期升序</option>
-            <option value="release_date_desc" {% if sort_option == 'release_date_desc' %}selected{% endif %}>发布日期降序</option>
+        <select id="sort_option">
+            <option value="default">默认排序</option>
+            <option value="price_asc">价格升序</option>
+            <option value="price_desc">价格降序</option>
+            <option value="release_date_asc">发布日期升序</option>
+            <option value="release_date_desc">发布日期降序</option>
         </select>
     </div>
 
     <div class="horizontal_box">
 
-        <div class="game-container">
-            {% for game in games %}
-            <div class="game_item" onclick="goToUrl('/game/{{ game.id }}')">
-                <div class="game_item_inside">
-                    <img class="game_cover_img" src="{{ url_for('static', filename='images/GenshinImpact_FM.png') }}"/>
-                    <p class="game_name">{{ game.name }}</p>
-                    <!--<p>Release Date: {{ game.release_date }}</p>-->
-    <!--                <p>{% if game.is_discounted %}<del>${{ game.price }}</del> ${{ game.discount_price }}{% else %}${{ game.price }}{% endif %}</p>-->
-                    <div class="game_price">
-                        {% if game.is_discounted %}
-                            {% set discount_percent = ((game.price - game.discount_price) / game.price) * 100 %}
-                            <a class="game_discount_box">-{{ discount_percent|round(2) }}%</a>
-                            <div class="game_price_inside">
-                                <del>${{ game.price }}</del>
-                                <div class="game_discount_price">${{ game.discount_price }}</div>
-                            </div>
-                        {% else %}
-                            <div class="game_price_inside">
-                                ${{ game.price }}
-                            </div>
-                        {% endif %}
-                    </div>
-                    <!--<p>Tags: {{ game.tags }}</p>-->
-                    <!--<a class="purchase_a" href="/game/{{ game.id }}">Purchase</a>-->
-                </div>
-            </div>
-            {% endfor %}
+        <div id="games_container" class="game-container">
+            <!-- 游戏项目将通过 Ajax 请求添加到这里 -->
         </div>
 
         <div class="filter">
@@ -84,17 +59,16 @@
                 </div>
                 <div class="filter_list">
                     <label class="filter_item">
-                        <input type="checkbox" name="price" class="discountCheckbox" value="on_discount" hidden="hidden">
+                        <input type="checkbox" name="price" id="discountCheckbox" class="discountCheckbox" value="on_discount" hidden="hidden">
                             特别优惠
                         <div class="icon fa-solid fa-check"></div>
                     </label>
                     <div class="price_filter_box">
                         筛选价格
-                        <input id="price_filter_range_input" type="range" min="0" max="260" value="260" step="20" oninput="updateValue(this.value)" onchange="buildRequest()">
+                        <input id="price_filter_range_input" type="range" min="0" max="260" value="260" step="20" oninput="updateValue(this.value)" onchange="loadGames(buildRequest())">
                         <span class="slider_value" id="price_filter_value_display">不限</span>
                     </div>
 
-<!--                    <div class="price_filter_item">需要添加控件</div>-->
                 </div>
             </div>
 
@@ -118,12 +92,16 @@
         </div>
 
     </div>
+
+	<div class="pages"></div>
+	
 </div>
 
 
 {% include 'footer.html' %}
 </body>
 </html>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.lazyload.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/toastr.js') }}"></script>
 {% include 'flash_js.html' %}
 <!--导航栏脱离-->
@@ -149,13 +127,195 @@
     });
 </script>
 
+<script>
+	
+$(document).ready(function() {
+	
+	var search_term_input = document.querySelector('input[name="search"]');
+
+	search_term_input.addEventListener("keyup", function(event) {
+		// 检查按下的键是否是回车键
+		if (event.key === "Enter") {
+			// 执行您的函数
+			loadGames(buildRequest());
+		}
+	});
+	
+    // 初始化页面时加载游戏数据
+    loadGames(buildRequest());
+
+    // 监听排序选项变化事件
+    $('#sort_option').change(function() {
+        loadGames(buildRequest());  // 排序选项变化时重新加载游戏数据
+    });
+});
+
+function loadGames(apiParams, reset=true) {
+    var apiUrl = '/api/game/search?';
+	console.log("loadGames",apiParams)
+    $.ajax({
+        type: 'GET',
+        url: apiUrl,
+		data: apiParams,
+        dataType: 'json',
+        success: function(response) {
+            if (response.response === 'success') {
+				console.log(response)
+                var gamesList = response.games;
+                var totalGamesCount = response.total_games;
+
+                // 更新搜索结果文本
+                var searchResultText = '';
+                if (response.search_params.search_term) {
+                    searchResultText = `“${response.search_params.search_term}”的搜索结果`;
+                }
+                $('#search_result_text').text(searchResultText);
+
+                // 更新已应用标签文本
+                var appliedTagsText = '';
+                if (response.search_params.search_tags) {
+                    var tagCount = response.search_params.search_tags.split(' ').length;
+                    appliedTagsText = `已应用 ${tagCount} 个标签`;
+                }
+                $('#applied_tags_text').text(appliedTagsText);
+
+                // 更新总游戏数显示
+                $('#total_games_count').text(totalGamesCount);
+
+                // 清空游戏容器
+                if(reset){
+                    $('#games_container').empty();
+                }
+				
+				// 生成分页按钮
+				generatePagination(response.total_pages, response.search_params.page);
+				
+                // 添加游戏项目到游戏容器
+                $.each(gamesList, function(index, game) {
+                    var gameItemHtml = `
+                        <div class="game_item" onclick="goToUrl('/${game.url}')">
+                            <div class="game_item_inside">
+                                <!--<img class="game_cover_img" src="${game.picture_url}"/>-->
+								<img class="game_cover_img" data-original="${game.picture_url}"/>
+                                <p class="game_name">${game.name}</p>
+                                <div class="game_price">
+                                    ${game.is_discounted ? `
+                                        <div class="game_discount_box">-${(((game.price - game.discount_price) / game.price) * 100).toFixed(2)}%</div>
+                                        <div class="game_price_inside">
+                                            <del>$${game.price}</del>
+                                            <div class="game_discount_price">$${game.discount_price}</div>
+                                        </div>
+                                    ` : `
+                                        <div class="game_price_inside">
+                                            $${game.price}
+                                        </div>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    $('#games_container').append(gameItemHtml);
+					
+					// 懒加载图片
+					$("img.game_cover_img").lazyload({effect: "show"});
+					
+					
+                });
+            } else {
+                // 处理请求失败的情况
+                toastr.error('加载游戏数据失败');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            // toastr.error('加载游戏数据失败');
+        }
+    });
+}
+
+function goToUrl(url) {
+    window.location.href = url;
+}
+
+</script>
+<script>
+function generatePagination(totalPages, currentPage) {
+    // console.log("generatePagination", { 'totalPages': totalPages, 'currentPage': currentPage });
+    var paginationHtml = '';
+
+    const maxButtons = 12; // 最大按钮数量
+    const halfButtons = Math.floor(maxButtons / 2); // 按钮的中点
+
+    // 生成上一页按钮
+    if (currentPage > 1) {
+        paginationHtml += `<button class="page_btn" data-page="${currentPage - 1}">上一页</button>`;
+    }
+
+    // 生成页码按钮
+    if (totalPages <= maxButtons) {
+        // 如果总页数小于或等于最大按钮数，显示所有页码
+        for (var i = 1; i <= totalPages; i++) {
+            paginationHtml += generatePageButton(i, currentPage);
+        }
+    } else {
+        // 如果总页数大于最大按钮数，显示部分页码
+        if (currentPage <= halfButtons) {
+            // 当前页靠近起始位置
+            for (var i = 1; i <= halfButtons + 2; i++) {
+                paginationHtml += generatePageButton(i, currentPage);
+            }
+            paginationHtml += '...';
+            paginationHtml += generatePageButton(totalPages, currentPage);
+        } else if (currentPage >= totalPages - halfButtons) {
+            // 当前页靠近结束位置
+            paginationHtml += generatePageButton(1, currentPage);
+            paginationHtml += '...';
+            for (var i = totalPages - halfButtons - 1; i <= totalPages; i++) {
+                paginationHtml += generatePageButton(i, currentPage);
+            }
+        } else {
+            // 当前页在中间位置
+            paginationHtml += generatePageButton(1, currentPage);
+            paginationHtml += '...';
+            for (var i = currentPage - 2; i <= currentPage + 2; i++) {
+                paginationHtml += generatePageButton(i, currentPage);
+            }
+            paginationHtml += '...';
+            paginationHtml += generatePageButton(totalPages, currentPage);
+        }
+    }
+
+    // 生成下一页按钮
+    if (currentPage < totalPages) {
+        paginationHtml += `<button class="page_btn" data-page="${currentPage + 1}">下一页</button>`;
+    }
+
+    // 更新分页容器内容
+    $('.pages').html(paginationHtml);
+
+    // 绑定点击事件
+    $('.page_btn').click(function() {
+        var selectedPage = $(this).data('page');
+        loadGames(buildRequest(selectedPage));  // 重新加载游戏数据
+    });
+}
+
+function generatePageButton(page, currentPage) {
+    if (page === currentPage) {
+        return `<button class="page_btn active" data-page="${page}">${page}</button>`;
+    } else {
+        return `<button class="page_btn" data-page="${page}">${page}</button>`;
+    }
+}
+</script>
 <!-- buildRequest 生成筛选后请求 -->
 <script>
-    function buildRequest() {
+    function buildRequest(page=1,perpage=20) {
         var selectedTags = [];
         var search_term_input = document.querySelector('input[name="search"]');
         var searchQueryParam = encodeURIComponent(search_term_input.value);
         var checkboxes = document.getElementsByClassName("tagCheckbox");
+		var price_checkbox = document.getElementById("discountCheckbox");
         var sortSelect = document.querySelector('.explore_sort_box select');
         var priceRangeInput = document.querySelector('#price_filter_range_input');
 
@@ -171,83 +331,55 @@
         }else{
             price = "";
         }
+		
         var tagsQueryParam = selectedTags.join('%20');
-        window.location.href = "http://127.0.0.1:2333/explore?search=" + searchQueryParam + "&tags=" + tagsQueryParam + "&max_price=" + price + "&sort=" + sortSelect.value;
+		
+		
+		
+        return "search=" + searchQueryParam + "&tags=" + tagsQueryParam + "&max_price=" + price + "&sort=" + sortSelect.value + "&discount_only=" + price_checkbox.checked + "&perpage=" + perpage + "&page=" + page;
     }
 </script>
 
-<!--初始化筛选控件-->
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // 获取搜索标签变量
-        var searchTags = "{{ search_tags }}";
-        var search_term = "{{ search_term }}";
-        var max_price = "{{ max_price }}";
-        var sort_option = "{{ sort_option }}";
-
-        // 分割搜索标签变量
-        var searchTagsArray = searchTags.split(' ');
-        var search_term_input = document.querySelector('input[name="search"]');
-        var priceRangeInput = document.querySelector('#price_filter_range_input');
-        var sortSelect = document.querySelector('.explore_sort_box select');
-
-        // 搜索字段
-        search_term_input.value = search_term
-
-        search_term_input.addEventListener("keyup", function(event) {
-            // 检查按下的键是否是回车键
-            if (event.key === "Enter") {
-                // 执行您的函数
-                buildRequest();
-            }
-        });
-
-        // 遍历所有复选框
-        var checkboxes = document.querySelectorAll('.tagCheckbox');
-        checkboxes.forEach(function(checkbox) {
-            // 检查复选框的值是否在搜索标签数组中
-            if (searchTagsArray.includes(checkbox.value)) {
-                checkbox.checked = true; // 如果是，则勾选复选框
-                $(checkbox).parent().addClass('filter_item_checked');
-            }
-        });
-
-        // 价格筛选器
-        if (max_price != "None") {
-            priceRangeInput.value = max_price;
-            updateValue(max_price);
-        }
-
-        // 排序选择器
-        // sortSelect.value = sort_option;
-
-    });
-</script>
 
 <script>
-        $(document).ready(function() {
-            $('.filter_head').on('click', function() {
-                // Toggle the visibility of the next sibling .filter_list
-                $(this).next('.filter_list').slideToggle();
+$(document).ready(function() {
+	$('.filter_head').on('click', function() {
 
-                // Toggle the icon class between fa-angle-down and fa-angle-up
-                $(this).find('.filter_head_icon').toggleClass('fa-angle-down fa-angle-up');
-            });
+		$(this).next('.filter_list').slideToggle();
 
-            $('.tagCheckbox').on('change', function() {
-                const parent_filter_item = $(this).parent();
-                if (this.checked) {
-                    parent_filter_item.addClass('filter_item_checked');
-                } else {
-                    parent_filter_item.removeClass('filter_item_checked');
-                }
-            });
+		$(this).find('.filter_head_icon').toggleClass('fa-angle-down fa-angle-up');
+	});
 
-            $(".filter_item").click(function () {
-                buildRequest();
-            });
+	$('.tagCheckbox').on('change', function() {
+		const parent_filter_item = $(this).parent();
+		if (this.checked) {
+			parent_filter_item.addClass('filter_item_checked');
+		} else {
+			parent_filter_item.removeClass('filter_item_checked');
+		}
+	});
 
-        });
+	$('.discountCheckbox').on('change', function() {
+		const parent_filter_item = $(this).parent();
+		if (this.checked) {
+			parent_filter_item.addClass('filter_item_checked');
+		} else {
+			parent_filter_item.removeClass('filter_item_checked');
+		}
+	});
+
+	$(".tagCheckbox").on('click',function(){	//.filter_item
+		loadGames(buildRequest(), reset=true)
+		buildRequest();
+	});
+	
+	$(".discountCheckbox").on('click',function(){	//.filter_item
+		loadGames(buildRequest(), reset=true)
+		buildRequest();
+	});
+
+
+});
 </script>
 <script>
     function updateValue(value) {
@@ -262,4 +394,10 @@
         }
         document.getElementById('price_filter_value_display').innerText = value;
     }
+</script>
+
+<script type="text/javascript">
+  $(function() {
+      
+  });
 </script>

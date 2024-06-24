@@ -1,32 +1,76 @@
-<!-- templates/redirect.html -->
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Redirecting...</title>
-    <script>
-        // 获取重定向 URL 和倒计时时间
-        const redirectUrl = '{{ redirect_url }}';
-        const redirectTime = {{ redirect_time }};
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<title>跳转中</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				background-color: #f0f0f0;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				justify-content: center;
+				/* 水平居中 */
+				align-items: center;
+				/* 垂直居中 */
+				height: 100vh;
+				/* 使用视口高度 */
+			}
 
-        // 设置定时器，倒计时结束后重定向
-        setTimeout(function() {
-            window.location.href = redirectUrl;
-        }, redirectTime * 1000); // 将秒转换为毫秒
+			.container {
+				text-align: center;
+			}
 
-        // 可选：在页面上显示倒计时
-        document.addEventListener('DOMContentLoaded', function() {
-            const countdownElement = document.getElementById('countdown');
-            for (let i = redirectTime; i > 0; i--) {
-                setTimeout(() => {
-                    countdownElement.textContent = i;
-                }, (redirectTime - i) * 1000);
-            }
-        });
-    </script>
-</head>
-<body>
-<h1>{{ message }}</h1>
-<p>Redirecting in <span id="countdown">5</span> seconds...</p>
-</body>
+			.game-image {
+				width: 300px;
+				max-width: 250px;
+				height: auto;
+				margin-bottom: auto;
+			}
+
+			button {
+				font-size: 2em;
+				padding: 10px 30px;
+				cursor: pointer;
+				border: none;
+				border-radius: 5px;
+				background-color: #4caf50;
+				color: white;
+				transition: background-color 0.3s ease;
+			}
+
+			button:hover {
+				background-color: #45a049;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<svg t="1718728332833" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2457" width="200" height="200"><path d="M405.333333 768c-12.8 0-21.333333-4.266667-29.866666-12.8l-213.333334-213.333333c-17.066667-17.066667-17.066667-42.666667 0-59.733334s42.666667-17.066667 59.733334 0l183.466666 183.466667 396.8-396.8c17.066667-17.066667 42.666667-17.066667 59.733334 0s17.066667 42.666667 0 59.733333l-426.666667 426.666667c-8.533333 8.533333-17.066667 12.8-29.866667 12.8z" p-id="2458" fill="#94C86C"></path></svg>
+			<h1>{{ message }}</h1>
+			<p>将在 <span id="countdown">5</span> 秒后重定向......</p>
+			<!-- <button id="jumpButton">321跳转</button> -->
+		</div>
+	</body>
+	<script>
+	    // 获取重定向 URL 和倒计时时间
+	    const redirectUrl = '{{ redirect_url }}';
+	    const redirectTime = {{ redirect_time }};
+	
+	    // 设置定时器，倒计时结束后重定向
+	    setTimeout(function() {
+	        window.location.href = redirectUrl;
+	    }, redirectTime * 1000); // 将秒转换为毫秒
+	
+	    // 可选：在页面上显示倒计时
+	    document.addEventListener('DOMContentLoaded', function() {
+	        const countdownElement = document.getElementById('countdown');
+	        for (let i = redirectTime; i > 0; i--) {
+	            setTimeout(() => {
+	                countdownElement.textContent = i;
+	            }, (redirectTime - i) * 1000);
+	        }
+	    });
+	</script>
 </html>

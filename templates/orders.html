@@ -4,6 +4,68 @@
     <meta charset="UTF-8">
     <title>您的订单</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/toastr.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        a {
+            margin-right: 10px;
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .pending {
+            color: #007BFF;
+        }
+
+        .expired {
+            color: red;
+        }
+
+        .paid {
+            color: green;
+        }
+
+        .unknown {
+            color: red;
+        }
+
+    </style>
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/toastr.js') }}"></script>
     {% include 'flash_js.html' %}
@@ -12,17 +74,37 @@
     <a href="/">回主页</a>
     <a href="/cart">回购物车</a>
     <h1>您的订单</h1>
-    <ul>
-        {% for order in orders %}
-            <li>
-                订单号: {{ order.id }} - 总价: ￥{{ order.total_price }} - 状态: {{ order.status }}
-                {% if order.status == 'Expired' %}
-                    <span style="color: red;">订单已过期</span>
-                {% else %}
-                    <a href="{{ url_for('pay_order', order_id=order.id) }}">支付</a>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                <th>订单号</th>
+                <th>总价</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>￥{{ order.total_price }}</td>
+                    <td>
+                        {% if order.status == 'Pending' %}
+                            <span class="pending">待支付</span>
+<!--                            <td><a href="{{ url_for('order_detail', order_id=order.id) }}">查看详情</a></td>-->
+<!--                            <a href="{{ url_for('pay_order', order_id=order.id) }}">支付</a>-->
+                        {% elif order.status == 'Expired' %}
+                            <span class="expired">订单已过期</span>
+                        {% elif order.status == 'Paid' %}
+                            <span class="paid">已支付</span>
+                        {% else %}
+                            <span class="unknown">...</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="{{ url_for('order_detail', order_id=order.id) }}">查看详情</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>

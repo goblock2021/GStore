@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <title>Edit Game</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<!--    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">-->
+    <link href="https://cdn.jsdelivr.net/npm/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/filepond.css') }}" rel="stylesheet">
     <style type="text/css">
         body {
             font-family: Arial, sans-serif;
@@ -112,12 +114,15 @@
     </style>
 </head>
 <body>
+    <script src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/toastr.js') }}"></script>
+    {% include 'flash_js.html' %}
     <div class="header_box">
         <div class="back" onclick="history.back()">返回</div>
         <p>编辑游戏</p>
     </div>
     <div class="fake_form">
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <p>
             {{ form.name.label }}
@@ -155,11 +160,62 @@
             {{ form.tags.label }}
             {{ form.tags(size=32) }}
         </p>
+<!--        <p>-->
+<!--            {{ form.cover_image.label }}-->
+<!--            <input type="file" name="cover_image" class="filepond" accept="image/*">-->
+<!--&lt;!&ndash;            {{ form.cover_image() }}&ndash;&gt;-->
+<!--        </p>-->
+<!--        <p>-->
+<!--            {{ form.screenshots.label }}-->
+<!--            <input type="file" name="screenshots" class="filepond" multiple accept="image/*">-->
+<!--&lt;!&ndash;            {{ form.screenshots() }}&ndash;&gt;-->
+<!--        </p>-->
+
         <p><input type="submit" value="保存"></p>
     </form>
-    <form action="/admin/games/{{game_id}}/delete" method="post" style="display:inline;">
+    <form action="/admin/games/{{ game.id }}/delete" method="post" style="display:inline;">
         <button type="submit" class="delete-button" onclick="return confirm('确定要删除吗？');">删除</button>
     </form>
     </div>
 </body>
+<!-- 引入 Filepond 的 JavaScript 文件 -->
+<script src="{{ url_for('static', filename='js/filepond.min.js') }}"></script>
+<!--<script src="{{ url_for('static', filename='js/filepond-plugin-file-validate-type.min.js') }}"></script>-->
+<script src="{{ url_for('static', filename='js/filepond-plugin-image-preview.min.js') }}"></script>
+<!--<script src="{{ url_for('static', filename='js/filepond-plugin-image-resize.min.js') }}"></script>-->
+<!--<script src="{{ url_for('static', filename='js/filepond-plugin-image-transform.min.js') }}"></script>-->
+
+
+<script>
+    // 初始化 Filepond 控件
+    document.addEventListener('DOMContentLoaded', function() {
+        FilePond.registerPlugin(
+            // FilePondPluginFileValidateType,
+            FilePondPluginImagePreview,
+            // FilePondPluginImageResize,
+            // FilePondPluginImageTransform
+        );
+
+        const filepondCover = document.querySelector('input[name="cover_image"]');
+        const filepondScreenshots = document.querySelector('input[name="screenshots"]');
+
+        const coverImageOptions = {
+            acceptedFileTypes: ['image/*'],
+            labelIdle: '拖拽或点击上传封面图像',
+            imagePreviewHeight: 150,
+            imageCropAspectRatio: '1:1'
+        };
+
+        const screenshotsOptions = {
+            acceptedFileTypes: ['image/*'],
+            labelIdle: '拖拽或点击上传截图',
+            allowMultiple: true,
+            imagePreviewHeight: 150,
+            imageCropAspectRatio: '16:9'
+        };
+
+        // FilePond.create(filepondCover, coverImageOptions);
+        // FilePond.create(filepondScreenshots, screenshotsOptions);
+    });
+</script>
 </html>

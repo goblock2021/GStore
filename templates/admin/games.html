@@ -13,6 +13,7 @@
                 <th>开发商</th>
                 <th>发行商</th>
                 <th>标签</th>
+                <th>图片管理</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -28,6 +29,8 @@
                 <td>{{ game.developer }}</td>
                 <td>{{ game.publisher }}</td>
                 <td>{{ game.tags }}</td>
+                <td><a href="{{ url_for('manage_screenshots', game_id=game.id) }}">管理图片</a></td>
+
                 <td>
                     <form action="{{ url_for('edit_game', game_id=game.id) }}" method="get" style="display: inline;">
                         <button type="submit" class="button">编辑</button>

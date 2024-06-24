@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>管理 {{ game.name }} 的截图和封面图</title>
+    <!-- 引入 FilePond 样式 -->
+    <link href="/static/css/filepond.css" rel="stylesheet">
+    <link href="/static/css/filepond-plugin-image-preview.css" rel="stylesheet">
+</head>
+<body>
+    <h1>管理 {{ game.name }} 的截图和封面图</h1>
+
+    <h2>上传封面图</h2>
+    <form name="cover" action="/admin/game/images/upload_cover/{{game.id}}" method="post" enctype="multipart/form-data">
+        <input type="file" id="cover-image" class="filepond" name="cover-image">
+        <button type="submit">Upload</button>
+    </form>
+
+
+    <h2>上传截图</h2>
+    <form name="screenshots" action="/admin/game/images/upload_screenshot/{{game.id}}" method="post" enctype="multipart/form-data">
+        <input type="file" id="screenshots" class="filepond" name="screenshots" multiple>
+        <button type="submit">Upload</button>
+    </form>
+
+    <script src="/static/js/filepond.min.js"></script>
+    <script src="/static/js/filepond-plugin-image-preview.min.js"></script>
+    <script src="/static/js/filepond-plugin-image-resize.min.js"></script>
+    <script src="/static/js/filepond-plugin-file-validate-size.js"></script>
+    <script src="/static/js/filepond-plugin-file-validate-type.min.js"></script>
+
+    <script>
+        // 注册 FilePond 插件
+        FilePond.registerPlugin(
+            FilePondPluginImagePreview,
+            FilePondPluginImageResize,
+            FilePondPluginFileValidateSize,
+            FilePondPluginFileValidateType
+        );
+
+        document.querySelectorAll('.filepond').forEach(element => {
+
+            let api_fetch_url,api_delete_url;
+            if (element.name === 'cover-image'){
+                api_fetch_url = "/admin/game/images/list_cover_image/{{game.id}}";
+                api_delete_url = "/admin/game/images/delete_cover_image/{{game.id}}";
+            } else if (element.name === 'screenshots'){
+                api_fetch_url = "/admin/game/images/list_screenshots/{{game.id}}";
+                api_delete_url = "/admin/game/images/delete_screenshot/";
+            }
+            const pond = FilePond.create(element, {
+                storeAsFile: true,
+                acceptedFileTypes: ['image/*'],
+
+                // 可以根据需要添加其他配置选项
+            });
+
+            // 发送 AJAX 请求获取文件列表
+            fetch(api_fetch_url)
+                .then(response => response.json())
+                .then(files => {    pond.setOptions({ files: files });    })
+                .catch(error => console.error('Error fetching files:', error));
+
+            pond.on('removefile', (error, file) => {
+                if (error){
+                    console.warn("remove file error:",error);
+                    return;
+                }
+                // 从 file 对象的 metadata 属性中获取自定义 ID 和标签
+                const id = file.getMetadata('id');
+                const game_id = file.getMetadata('game_id');
+
+                console.log({
+                    'Message': 'File removed',
+                    'Game ID:': game_id,
+                    'ID:': id,
+                    'Query': api_delete_url + id,
+                });
+                console.log('Game ID:', game_id);
+                fetch(api_delete_url + id, {
+                    method: 'POST',
+                })
+                    .then(response => {
+                        console.log(response);
+                        if (!response.ok) {
+                            console.error('Error deleting file:', response);
+                        }
+                    })
+                    .catch(error => console.error('Error deleting file:', error));
+
+            })
+
+            pond.on('addfile', (error, file) => {
+                if (error) {
+                    console.warn('File add error', error);
+                    return;
+                }
+                console.log('File added', file);
+
+            });
+
+        });
+    </script>
+</body>
+</html>

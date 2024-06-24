@@ -9,10 +9,11 @@ body{
 }
 
 .explore{
+    width: 80%;
     color: white;
-    margin-top: 30px;
-    margin-left: 80px;
-    margin-right: 80px;
+    margin: auto;
+    /*margin-left: 80px;*/
+    /*margin-right: 80px;*/
 }
 #explore_detail{
     margin-bottom: 10px;
@@ -37,11 +38,11 @@ body{
 .horizontal_box{
     display: flex;
     flex-direction: row;
-    /*justify-content: space-between;*/
+    justify-content: space-between;
     /*margin-bottom: 20px;*/
 }
 .game-container {
-    width: 855px;
+    /*width: 855px;*/
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -74,11 +75,13 @@ body{
 }
 
 .filter{
+    min-width: 250px;
     display: flex;
     flex-direction: column;
 }
 
 .filter_head{
+
     display: flex;
     justify-content: space-between;
     align-items: center
@@ -103,6 +106,7 @@ body{
 }
 
 .filter_search_input{
+    /*width: 200px;*/
     width: 100%;
     padding: 10px;
     margin-top: 10px;
@@ -155,7 +159,7 @@ body{
     display: block;
 }
 .game_item {
-    width: 23%; /* 控制每个游戏项的宽度，以便一行显示4个游戏 */
+    /*width: 23%; !* 控制每个游戏项的宽度，以便一行显示4个游戏 *!*/
     margin-bottom: 20px;
     /*border: 1px solid #ddd; !* 添加边框或其他样式 *!*/
     padding: 10px;
@@ -182,5 +186,17 @@ body{
 
 .purchase_a{
     color: white;
+}
 
+.pages{
+    margin: 20px 0;
+}
+
+.page_btn{
+    padding: 5px 10px;
+    margin-right: 5px;
+    border-radius: 5px;
+    background: #1e1e1e;
+    color: white;
+    cursor: pointer;
 }

@@ -43,10 +43,6 @@ static文件夹中包含了一些静态资源，如图片和CSS文件。
    python app.py
    ```
 
-## 开源协议
-
-本项目使用MIT开源协议，详情请参考[LICENSE](LICENSE)文件。
-
 ## 贡献
 
 欢迎任何形式的贡献，包括但不限于提交问题、提出改进建议、提交Pull Request。
